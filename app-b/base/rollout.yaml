@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  labels:
+    app: app-b
+  name: app-b
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: app-b
+  strategy:
+    blueGreen:
+      activeService: app-b
+      autoPromotionEnabled: true
+      previewService: app-b-preview
+  template:
+    metadata:
+      labels:
+        app: app-b
+    spec:
+      containers:
+        - image: codedev.jfrog.io/pov-sandbox-fd396f0/app-b:4fb0154
+          imagePullPolicy: Always
+          name: app-b
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+      restartPolicy: Always
