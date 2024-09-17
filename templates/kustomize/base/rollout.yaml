@@ -1,0 +1,38 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  labels:
+    app: application-name
+  name: application-name
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: application-name
+  strategy:
+    blueGreen:
+      activeService: application-name
+      autoPromotionEnabled: true
+      previewService: application-name-preview
+  template:
+    metadata:
+      labels:
+        app: application-name
+    spec:
+      containers:
+        - image: fqdn-image:image-tag
+          imagePullPolicy: Always
+          name: application-name
+          ports:
+            - containerPort: 80
+              name: http
+              protocol: TCP
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+      restartPolicy: Always
